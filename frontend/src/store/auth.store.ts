@@ -12,7 +12,7 @@ type Store = {
    auth: Auth
    login: (email: string, password: string) => Promise<boolean>
    register: (email: string, password: string) => Promise<boolean>
-   verifyToken: () => Promise<void>
+   verifyToken: (data: Auth) => Promise<void>
 }
 
 export const useAuthStore = create<Store>()((set) => ({
@@ -25,7 +25,7 @@ export const useAuthStore = create<Store>()((set) => ({
 
    login: async (email, password) => {
       try {
-         const data = await fetchSinToken("auth/register", "POST", { email, password });
+         const data = await fetchSinToken("auth/login", "POST", { email, password });
          if (data.token) {
             localStorage.setItem("token", data.token)
             set({
@@ -74,13 +74,13 @@ export const useAuthStore = create<Store>()((set) => ({
       }
    },
 
-   verifyToken: async () => {
+   verifyToken: async (data: Auth) => {
       set({
          auth: {
-            id: null,
-            checking: true,
-            logged: false,
-            email: ""
+            id: data.id,
+            checking: data.checking,
+            logged: data.logged,
+            email: data.email
          },
       });
    }

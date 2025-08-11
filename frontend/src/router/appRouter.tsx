@@ -5,47 +5,66 @@ import AuthRouter from "./authRouter";
 import { useAuthStore } from "../store/auth.store";
 import { useCallback, useEffect } from "react";
 import { fetchConToken } from "../helpers/fetch.helper";
+import { PublicRoute } from "./public.router";
+import { PrivateRoute } from "./private.router";
 
 export default function AppRouter() {
-
-   const { auth, verifyToken } = useAuthStore()
+   const { auth, verifyToken } = useAuthStore();
 
    const verifyTokenCallback = useCallback(async () => {
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token");
       if (!token) {
-         verifyToken()
+         verifyToken({ id: null, checking: false, logged: false, email: null });
+         return false;
       }
 
-      const resp = await fetchConToken("auth/renew", "GET")
-      if (resp.token) {
-         localStorage.setItem("token", resp.token)
-
-         return true
-      }else{
-         // poner todo checking a false logged a false y el resto a null
+      const data = await fetchConToken("auth/renew", "GET");
+      if (data.token) {
+         localStorage.setItem("token", data.token);
+         verifyToken({
+            id: data.user.id,
+            checking: false,
+            logged: true,
+            email: data.user.email
+         });
+         return true;
+      } else {
+         verifyToken({ id: null, checking: false, logged: false, email: null });
+         return false;
       }
-   }, [])
-
-
+   }, [verifyToken]);
 
    useEffect(() => {
-
-   }, [])
+      verifyTokenCallback();
+   }, [verifyTokenCallback]);
 
    if (auth.checking) {
-      return "Espere porfavor"
+      return "Espere por favor...";
    }
 
    return (
       <BrowserRouter>
          <Routes>
-            <Route path="/" element={<Navigate to="/auth/login" replace />} />
+            <Route
+               path="/auth/*"
+               element={
+                  <PublicRoute>
+                     <AuthRouter />
+                  </PublicRoute>
+               }
+            />
 
-            {/* Rutas de autenticación */}
-            <Route path="auth/*" element={<AuthRouter />} />
+            <Route
+               path="/chat"
+               element={
+                  <PrivateRoute>
+                     <ChatPage />
+                  </PrivateRoute>
+               }
+            />
 
-            {/* Rutas protegidas */}
-            <Route path="chat" element={<ChatPage />} />
+            {/* Redirección raíz */}
+            <Route path="/" element={<Navigate to="/chat" replace />} />
 
             {/* Ruta 404 */}
             <Route path="*" element={<h1>Página no encontrada</h1>} />
