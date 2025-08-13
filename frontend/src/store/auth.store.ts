@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { fetchSinToken } from "../helpers/fetch.helper";
 
+
+
 interface Auth {
    id: number | null
    checking: boolean

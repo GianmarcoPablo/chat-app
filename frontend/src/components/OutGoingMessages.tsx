@@ -1,11 +1,14 @@
+import type { Mensaje } from "../store/chat.store";
 
+interface Props {
+   msg: Mensaje
+}
 
-export default function OutGoingMessages() {
+export default function OutGoingMessages({ msg }: Props) {
    return (
       <div className="outgoing_msg">
          <div className="sent_msg">
-            <p>Test which is a new approach to have all
-               solutions</p>
+            <p>{msg.mensaje}</p>
             <span className="time_date"> 11:01 AM | June 9</span>
          </div>
       </div>

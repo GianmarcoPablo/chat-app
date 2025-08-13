@@ -1,6 +1,11 @@
+import type { Mensaje } from "../store/chat.store";
 
 
-export default function IncomingMessages() {
+interface Props {
+   msg: Mensaje
+}
+
+export default function IncomingMessages({ msg }: Props) {
    return (
       <div className="incoming_msg">
          <div className="incoming_msg_img">
@@ -8,8 +13,7 @@ export default function IncomingMessages() {
          </div>
          <div className="received_msg">
             <div className="received_withd_msg">
-               <p>Test which is a new approach to have all
-                  solutions</p>
+               <p>{msg.mensaje}</p>
                <span className="time_date"> 11:01 AM | June 9</span>
             </div>
          </div>
